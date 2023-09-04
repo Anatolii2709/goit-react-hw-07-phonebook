@@ -1,15 +1,14 @@
 import React, { useState } from 'react';
 import { Button, FormContainer, InputForm, Label } from './ContactForm.styled';
 
-import { nanoid } from 'nanoid';
 import { useDispatch, useSelector } from 'react-redux';
-import { setContacts } from 'store/contactSlice';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { addContact } from 'store/contacts/contactsThunk';
 
 const ContactForm = () => {
   const [name, setName] = useState('');
-  const [number, setNumber] = useState('');
+  const [phone, setPhone] = useState('');
 
   const contacts = useSelector(state => state.myContact.contacts);
   const dispatch = useDispatch();
@@ -17,13 +16,13 @@ const ContactForm = () => {
   const handleInputChange = e => {
     e.target.name === 'name'
       ? setName(e.target.value)
-      : setNumber(e.target.value);
+      : setPhone(e.target.value);
   };
 
   const handleSubmit = e => {
     e.preventDefault();
     if (
-      contacts.some(
+      contacts.items.some(
         contact => contact.name.toLowerCase() === name.toLowerCase()
       )
     ) {
@@ -34,10 +33,9 @@ const ContactForm = () => {
     }
 
     dispatch(
-      setContacts({
-        id: nanoid(),
+      addContact({
         name,
-        number,
+        phone,
       })
     );
 
@@ -66,7 +64,7 @@ const ContactForm = () => {
           Number
           <InputForm
             type="tel"
-            name="number"
+            name="phone"
             placeholder="Number"
             pattern="\+?[0-9\s\-\(\)]+"
             title="Phone number"

@@ -1,7 +1,6 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { deleteContact } from 'store/contactSlice';
 import { useSelector, useDispatch } from 'react-redux';
 import {
   Contact,
@@ -11,11 +10,21 @@ import {
   Number,
   Name,
 } from './ContactList.styled';
+import { deleteContact, fetchContacts } from 'store/contacts/contactsThunk';
 
 const ContactList = () => {
   const contacts = useSelector(state => state.myContact.contacts);
   const filter = useSelector(state => state.myContact.filter);
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(fetchContacts());
+  }, [dispatch]);
+
+  const data = [...contacts.items];
+  data.sort((firstContact, secondContact) =>
+    firstContact.name.localeCompare(secondContact.name)
+  );
 
   const contactDelete = id => {
     dispatch(deleteContact(id));
@@ -25,7 +34,7 @@ const ContactList = () => {
   };
 
   const filteredContacts = () =>
-    contacts.filter(contact =>
+    data.filter(contact =>
       contact.name.toLowerCase().includes(filter.toLowerCase())
     );
 
@@ -38,7 +47,7 @@ const ContactList = () => {
             <Contact key={contact.id}>
               <ContactInfo>
                 <Name>{contact.name}</Name>
-                <Number> : {contact.number}</Number>
+                <Number> : {contact.phone}</Number>
               </ContactInfo>
               <ButtonDelete onClick={() => contactDelete(id)}>
                 delete
